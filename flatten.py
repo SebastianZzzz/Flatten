@@ -53,6 +53,23 @@ def smart_flatten(source_dir):
             print(f"[{count}] Moved: {file_path.name}")
         except Exception as e:
             print(f"Failed to move {file_path.name}: {e}")
+
+    # --- 第四阶段：清理 (Cleanup) ---
+    print("\n--- 正在清理空的原始子文件夹 ---")
+    # 使用 topdown=False (后序遍历)，从最深层开始往上删
+    for root, dirs, _ in os.walk(source_path, topdown=False):
+        for name in dirs:
+            dir_to_check = Path(root) / name
+            
+            if dir_to_check == target_path:
+                continue
+            
+            try:
+                os.rmdir(dir_to_check)
+                print(f"Removed empty folder: {name}")
+            except OSError:
+                # 文件夹非空，直接跳过
+                pass
     
     print(f"\n--- 任务完成 ---")
     print(f"成功压扁 {count} 个文件到: {target_path}")
